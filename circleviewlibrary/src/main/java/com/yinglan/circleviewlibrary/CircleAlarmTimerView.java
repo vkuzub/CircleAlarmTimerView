@@ -21,6 +21,7 @@ package com.yinglan.circleviewlibrary;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -36,6 +37,7 @@ public class CircleAlarmTimerView extends View {
     private static final String TAG = "CircleTimerView";
 
     public static final double RAD_TO_HOURS_MULTIPLIER = 1.909859;
+    private final int[] numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
 
     // Status
     private static final String INSTANCE_STATUS = "instance_status";
@@ -149,7 +151,7 @@ public class CircleAlarmTimerView extends View {
         mTimerTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, DEFAULT_TIMER_TEXT_SIZE, getContext()
                 .getResources().getDisplayMetrics());
         mTextInCircleSize = mTimerNumberSize / 2;
-        mInnerCircleStrokeWidth = mCircleStrokeWidth*2;
+        mInnerCircleStrokeWidth = mCircleStrokeWidth * 2;
 
         // Set default color or read xml attributes
         mCircleColor = DEFAULT_CIRCLE_COLOR;
@@ -243,14 +245,11 @@ public class CircleAlarmTimerView extends View {
 
         //main circle with 2 small circles
         float mainCircleRadius = mRadius - mCircleStrokeWidth / 2 - mGapBetweenCircleAndLine; //300
-        canvas.drawCircle(mCx, mCy, mainCircleRadius, mNumberPaint);
+        drawMainCircle(canvas, mainCircleRadius);
 //        canvas.save();
 //        canvas.rotate(-90, mCx, mCy);
 
-        float innerCircleRadius = mainCircleRadius - mCircleButtonRadius - mInnerCircleStrokeWidth ; //250
-        Log.d("mainC",String.valueOf(mainCircleRadius));
-        Log.d("innerC",String.valueOf(innerCircleRadius));
-        canvas.drawCircle(mCx, mCy, innerCircleRadius, mInnerCirclePaint);
+        drawInnerCircle(canvas, mainCircleRadius);
 
 //        RectF rect = new RectF(mCx - (mRadius - mCircleStrokeWidth / 2 - mGapBetweenCircleAndLine
 //        ), mCy - (mRadius - mCircleStrokeWidth / 2 - mGapBetweenCircleAndLine
@@ -268,6 +267,96 @@ public class CircleAlarmTimerView extends View {
 //        canvas.save();
 //      ard
 
+
+//        drawDigitalTime(canvas);
+        drawCircleButtons(canvas);
+        drawHandCircle(canvas);
+
+        drawNumerals(canvas, mainCircleRadius);
+        drawNumeralLines(canvas, mainCircleRadius);
+
+        if (null != mListener) {
+            mListener.start(String.valueOf(mHours));
+            mListener.end(String.valueOf(mMinutes));
+        }
+
+//        float[] points = {mCy - 100, mCx / 2,
+//                mCy / 2 + 100, mCx / 2,
+//                mCy / 2, mCx / 2 - 100,
+//                mCy / 2, mCx / 2 + 100};
+//        canvas.drawPoints(points, mTimerColonPaint);
+
+        canvas.restore();
+        // Timer Text
+        canvas.save();
+        canvas.restore();
+        super.onDraw(canvas);
+    }
+
+    private void drawHandCircle(Canvas canvas) {
+        Paint paint = new Paint();
+        paint.setColor(Color.WHITE);
+//        paint.setStrokeWidth(20);
+        canvas.drawCircle(mCx, mCy, 12, paint);
+    }
+
+    private void drawNumerals(Canvas canvas, float mainCircleRadius) {
+        Paint paint = new Paint();
+        paint.setTextSize((float) (mTextInCircleSize / 1.5));
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setColor(Color.WHITE);
+        for (int number : numbers) {
+            String tmp = String.valueOf(number);
+            //поиск ширины
+//            paint.getTextBounds(tmp, 0, tmp.length(), rect);
+            double angle = Math.PI / 6 * (number - 3);
+            float x = (float) (mCx + Math.cos(angle) * mainCircleRadius / 1.6);
+            float y = (float) (mCy + Math.sin(angle) * mainCircleRadius / 1.6);
+            canvas.drawText(tmp, x, y, paint);
+        }
+    }
+
+    private void drawNumeralLines(Canvas canvas, float mainCircleRadius) {
+        Paint paint = new Paint();
+        paint.setColor(Color.WHITE);
+        paint.setTextSize(15);
+        int n = 60;
+        double angle = 0;
+        for (int i = 0; i < n; i++) {
+            angle += 2 * Math.PI / n;
+            float x = (float) (mCx + Math.cos(angle) * mainCircleRadius / 1.25);
+            float y = (float) (mCy + Math.sin(angle) * mainCircleRadius / 1.25);
+            canvas.drawCircle(x, y, 3, paint);
+        }
+    }
+
+    private void drawMainCircle(Canvas canvas, float mainCircleRadius) {
+        canvas.drawCircle(mCx, mCy, mainCircleRadius, mNumberPaint);
+    }
+
+    private void drawInnerCircle(Canvas canvas, float mainCircleRadius) {
+        float innerCircleRadius = mainCircleRadius - mCircleButtonRadius - mInnerCircleStrokeWidth; //250
+        Log.d("mainC", String.valueOf(mainCircleRadius));
+        Log.d("innerC", String.valueOf(innerCircleRadius));
+        canvas.drawCircle(mCx, mCy, innerCircleRadius, mInnerCirclePaint);
+    }
+
+    private void drawDigitalTime(Canvas canvas) {
+        //time in center
+
+        canvas.drawText(getHours() + " " + getMinutes(), mCx, mCy + getFontHeight(mTimerNumberPaint) / 2, mTimerNumberPaint);
+        canvas.drawText(":", mCx, mCy + getFontHeight(mTimerNumberPaint) / 2, mTimerColonPaint);
+    }
+
+    private String getHours() {
+        return mHours < 10 ? String.valueOf("0" + mHours) : String.valueOf(mHours);
+    }
+
+    private String getMinutes() {
+        return mMinutes < 10 ? String.valueOf("0" + mMinutes) : String.valueOf(mMinutes);
+    }
+
+    private void drawCircleButtons(Canvas canvas) {
         canvas.rotate((float) Math.toDegrees(mCurrentRadian), mCx, mCy);
         canvas.drawCircle(mCx, getMeasuredHeight() / 2 - mRadius + mCircleStrokeWidth / 2 + mGapBetweenCircleAndLine
                 , 0.01f, mLinePaint);
@@ -280,30 +369,24 @@ public class CircleAlarmTimerView extends View {
         // TimerNumber
         canvas.save();
 
-        //time in center
-        String hours = mHours < 10 ? String.valueOf("0" + mHours) : String.valueOf(mHours);
-        String minutes = mMinutes < 10 ? String.valueOf("0" + mMinutes) : String.valueOf(mMinutes);
-        canvas.drawText(hours + " " + minutes, mCx, mCy + getFontHeight(mTimerNumberPaint) / 2, mTimerNumberPaint);
-        canvas.drawText(":", mCx, mCy + getFontHeight(mTimerNumberPaint) / 2, mTimerColonPaint);
 
         Log.d("measuredHeight=", String.valueOf(getMeasuredHeight())); //520
         float circleY = (getMeasuredHeight() / 2) - mRadius + (mCircleStrokeWidth / 2) + mGapBetweenCircleAndLine; //50
         float circleTextY = circleY + (mCircleButtonRadius / 2); //65
-
         //circles
         if (ismInCircleButton) {
 //            Path path = new Path();
 //            canvas.drawTextOnPath();
             canvas.rotate((float) Math.toDegrees(mCurrentRadian), mCx, mCy);
             canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mCircleButtonPaint);
-            canvas.drawText(hours, mCx, circleTextY, mTextInCirclePaint);
+            drawTextInCircleButton(canvas, getHours(), mCx, circleTextY);
             canvas.restore();
             canvas.save();
 
 
             canvas.rotate((float) Math.toDegrees(mCurrentRadian1), mCx, mCy);
             canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mTimerColonPaint);
-            canvas.drawText(minutes, mCx, circleTextY, mTextInCirclePaint);
+            drawTextInCircleButton(canvas, getMinutes(), mCx, circleTextY);
             canvas.restore();
             canvas.save();
 
@@ -311,28 +394,20 @@ public class CircleAlarmTimerView extends View {
 
             canvas.rotate((float) Math.toDegrees(mCurrentRadian1), mCx, mCy);
             canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mTimerColonPaint);
-            canvas.drawText(minutes, mCx, circleTextY, mTextInCirclePaint);
+            drawTextInCircleButton(canvas, getMinutes(), mCx, circleTextY);
             canvas.restore();
             canvas.save();
 
             canvas.rotate((float) Math.toDegrees(mCurrentRadian), mCx, mCy);
             canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mCircleButtonPaint);
-            canvas.drawText(hours, mCx, circleTextY, mTextInCirclePaint);
+            drawTextInCircleButton(canvas, getHours(), mCx, circleTextY);
             canvas.restore();
             canvas.save();
-
         }
+    }
 
-        if (null != mListener) {
-            mListener.start(String.valueOf(mHours));
-            mListener.end(String.valueOf(mMinutes));
-        }
-
-        canvas.restore();
-        // Timer Text
-        canvas.save();
-        canvas.restore();
-        super.onDraw(canvas);
+    private void drawTextInCircleButton(Canvas canvas, String time, float x, float y) {
+        canvas.drawText(time, x, y, mTextInCirclePaint);
     }
 
     private float getFontHeight(Paint paint) {
