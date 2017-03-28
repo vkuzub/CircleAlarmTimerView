@@ -60,5 +60,5 @@
         android:layout_height="260dp"
         android:layout_alignParentBottom="true"
         android:layout_margin="40dp"
-        android:background="@android:color/black"/>
+        />
 </RelativeLayout>

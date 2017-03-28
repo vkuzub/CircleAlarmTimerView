@@ -61,9 +61,11 @@ public class CircleAlarmTimerView extends View {
     private static final int DEFAULT_TIMER_COLON_COLOR = 0xFF000000; //minute circle color
     private static final int DEFAULT_TIMER_TEXT_COLOR = 0x99F0F9FF;
     private static final int DEFAULT_TEXT_IN_CIRCLE_COLOR = 0xFF68C5D7;
+    private static final int DEFAULT_INNER_CIRCLE_COLOR = 0xFF2F2F2F;
 
     // Paint
     private Paint mCirclePaint;
+    private Paint mInnerCirclePaint;
     private Paint mHighlightLinePaint;
     private Paint mLinePaint;
     private Paint mCircleButtonPaint;
@@ -80,12 +82,14 @@ public class CircleAlarmTimerView extends View {
     private float mLineWidth;
     private float mCircleButtonRadius;
     private float mCircleStrokeWidth;
+    private float mInnerCircleStrokeWidth;
     private float mTimerNumberSize;
     private float mTimerTextSize;
     private float mTextInCircleSize;
 
     // Color
     private int mCircleColor;
+    private int mInnerCircleColor;
     private int mCircleButtonColor;
     private int mLineColor;
     private int mArcColor;
@@ -145,6 +149,7 @@ public class CircleAlarmTimerView extends View {
         mTimerTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, DEFAULT_TIMER_TEXT_SIZE, getContext()
                 .getResources().getDisplayMetrics());
         mTextInCircleSize = mTimerNumberSize / 2;
+        mInnerCircleStrokeWidth = mCircleStrokeWidth*2;
 
         // Set default color or read xml attributes
         mCircleColor = DEFAULT_CIRCLE_COLOR;
@@ -156,6 +161,7 @@ public class CircleAlarmTimerView extends View {
         mTimerTextColor = DEFAULT_TIMER_TEXT_COLOR;
         mTextInCircleColor = DEFAULT_TEXT_IN_CIRCLE_COLOR;
         mArcColor = DEFAULT_ARC_COLOR;
+        mInnerCircleColor = DEFAULT_INNER_CIRCLE_COLOR;
 
         // Init all paints
         mCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -168,11 +174,17 @@ public class CircleAlarmTimerView extends View {
         mTimerColonPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mArcPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mTextInCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mInnerCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
         // CirclePaint
         mCirclePaint.setColor(mCircleColor);
         mCirclePaint.setStyle(Paint.Style.STROKE);
         mCirclePaint.setStrokeWidth(mCircleStrokeWidth);
+
+        // CircleInnerPaint
+        mInnerCirclePaint.setColor(mInnerCircleColor);
+        mInnerCirclePaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        mInnerCirclePaint.setStrokeWidth(mInnerCircleStrokeWidth);
 
         // CircleButtonPaint
         mCircleButtonPaint.setColor(mCircleButtonColor);
@@ -230,9 +242,15 @@ public class CircleAlarmTimerView extends View {
         canvas.save();
 
         //main circle with 2 small circles
-        canvas.drawCircle(mCx, mCy, mRadius - mCircleStrokeWidth / 2 - mGapBetweenCircleAndLine, mNumberPaint);
-        canvas.save();
-        canvas.rotate(-90, mCx, mCy);
+        float mainCircleRadius = mRadius - mCircleStrokeWidth / 2 - mGapBetweenCircleAndLine; //300
+        canvas.drawCircle(mCx, mCy, mainCircleRadius, mNumberPaint);
+//        canvas.save();
+//        canvas.rotate(-90, mCx, mCy);
+
+        float innerCircleRadius = mainCircleRadius - mCircleButtonRadius - mInnerCircleStrokeWidth ; //250
+        Log.d("mainC",String.valueOf(mainCircleRadius));
+        Log.d("innerC",String.valueOf(innerCircleRadius));
+        canvas.drawCircle(mCx, mCy, innerCircleRadius, mInnerCirclePaint);
 
 //        RectF rect = new RectF(mCx - (mRadius - mCircleStrokeWidth / 2 - mGapBetweenCircleAndLine
 //        ), mCy - (mRadius - mCircleStrokeWidth / 2 - mGapBetweenCircleAndLine
@@ -274,6 +292,8 @@ public class CircleAlarmTimerView extends View {
 
         //circles
         if (ismInCircleButton) {
+//            Path path = new Path();
+//            canvas.drawTextOnPath();
             canvas.rotate((float) Math.toDegrees(mCurrentRadian), mCx, mCy);
             canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mCircleButtonPaint);
             canvas.drawText(hours, mCx, circleTextY, mTextInCirclePaint);
@@ -288,15 +308,16 @@ public class CircleAlarmTimerView extends View {
             canvas.save();
 
         } else {
-            canvas.rotate((float) Math.toDegrees(mCurrentRadian), mCx, mCy);
-            canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mCircleButtonPaint);
-            canvas.drawText(hours, mCx, circleTextY, mTextInCirclePaint);
-            canvas.restore();
-            canvas.save();
 
             canvas.rotate((float) Math.toDegrees(mCurrentRadian1), mCx, mCy);
             canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mTimerColonPaint);
             canvas.drawText(minutes, mCx, circleTextY, mTextInCirclePaint);
+            canvas.restore();
+            canvas.save();
+
+            canvas.rotate((float) Math.toDegrees(mCurrentRadian), mCx, mCy);
+            canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mCircleButtonPaint);
+            canvas.drawText(hours, mCx, circleTextY, mTextInCirclePaint);
             canvas.restore();
             canvas.save();
 
