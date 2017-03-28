@@ -270,10 +270,15 @@ public class CircleAlarmTimerView extends View {
 
 //        drawDigitalTime(canvas);
         drawCircleButtons(canvas);
-        drawHandCircle(canvas);
+
 
         drawNumerals(canvas, mainCircleRadius);
         drawNumeralLines(canvas, mainCircleRadius);
+
+        drawHand(canvas, mHours, true);
+        drawHand(canvas, mMinutes, false);
+
+        drawHandCircle(canvas);
 
         if (null != mListener) {
             mListener.start(String.valueOf(mHours));
@@ -298,6 +303,20 @@ public class CircleAlarmTimerView extends View {
         paint.setColor(Color.WHITE);
 //        paint.setStrokeWidth(20);
         canvas.drawCircle(mCx, mCy, 12, paint);
+    }
+
+    private void drawHand(Canvas canvas, double pos, boolean isHour) {
+        Paint paint = new Paint();
+        paint.setColor(Color.WHITE);
+        paint.setStrokeWidth(5);
+        double angle = isHour ?
+                Math.PI * pos * 5 / 30 - Math.PI / 2
+                : Math.PI * pos / 30 - Math.PI / 2;
+        float handRadius = isHour ? mRadius / 3 : mRadius / 2;
+        canvas.drawLine(mCx, mCy,
+                (float) (mCx + Math.cos(angle) * handRadius),
+                (float) (mCy + Math.sin(angle) * handRadius),
+                paint);
     }
 
     private void drawNumerals(Canvas canvas, float mainCircleRadius) {
