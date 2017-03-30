@@ -116,6 +116,7 @@ public class CircleAlarmTimerView extends View {
     private int mHours;
     private int mMinutes;
 
+
     private OnTimeChangedListener mListener;
 
     public CircleAlarmTimerView(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -275,8 +276,8 @@ public class CircleAlarmTimerView extends View {
         drawNumerals(canvas, mainCircleRadius);
         drawNumeralLines(canvas, mainCircleRadius);
 
-        drawHand(canvas, mHours, true);
-        drawHand(canvas, mMinutes, false);
+        drawHandHour(canvas, mHours);
+        drawHandMinute(canvas, mMinutes);
 
         drawHandCircle(canvas);
 
@@ -298,6 +299,40 @@ public class CircleAlarmTimerView extends View {
         super.onDraw(canvas);
     }
 
+    private void drawHandMinute(Canvas canvas, double pos) {
+        Paint paint = new Paint();
+        paint.setColor(Color.WHITE);
+        paint.setStrokeWidth(5);
+        double angle =
+                Math.PI * pos / 30 - Math.PI / 2;
+        float handRadius = mRadius / 2;
+        canvas.drawLine(mCx, mCy,
+                (float) (mCx + Math.cos(angle) * handRadius),
+                (float) (mCy + Math.sin(angle) * handRadius),
+                paint);
+    }
+
+    private void drawHandHour(Canvas canvas, double pos) {
+        Paint paint = new Paint();
+        paint.setColor(Color.WHITE);
+        paint.setStrokeWidth(5);
+        double minuteAngle = 0;
+        if (mMinutes > 15) {
+            minuteAngle = Math.PI * mMinutes / 30 ;
+        } else {
+            minuteAngle = Math.PI * mMinutes / 30 - Math.PI / 2;
+            minuteAngle = Math.PI/2 + minuteAngle;
+        }
+        double angle = Math.PI * pos * 5 / 30 - Math.PI / 2 + minuteAngle / 12;
+        Log.d("mangle", String.valueOf(minuteAngle));
+        Log.d("hangle", String.valueOf(angle));
+        float handRadius = mRadius / 3;
+        canvas.drawLine(mCx, mCy,
+                (float) (mCx + Math.cos(angle) * handRadius),
+                (float) (mCy + Math.sin(angle) * handRadius),
+                paint);
+    }
+
     private void drawHandCircle(Canvas canvas) {
         Paint paint = new Paint();
         paint.setColor(Color.WHITE);
@@ -305,19 +340,6 @@ public class CircleAlarmTimerView extends View {
         canvas.drawCircle(mCx, mCy, 12, paint);
     }
 
-    private void drawHand(Canvas canvas, double pos, boolean isHour) {
-        Paint paint = new Paint();
-        paint.setColor(Color.WHITE);
-        paint.setStrokeWidth(5);
-        double angle = isHour ?
-                Math.PI * pos * 5 / 30 - Math.PI / 2
-                : Math.PI * pos / 30 - Math.PI / 2;
-        float handRadius = isHour ? mRadius / 3 : mRadius / 2;
-        canvas.drawLine(mCx, mCy,
-                (float) (mCx + Math.cos(angle) * handRadius),
-                (float) (mCy + Math.sin(angle) * handRadius),
-                paint);
-    }
 
     private void drawNumerals(Canvas canvas, float mainCircleRadius) {
         Paint paint = new Paint();
@@ -355,8 +377,6 @@ public class CircleAlarmTimerView extends View {
 
     private void drawInnerCircle(Canvas canvas, float mainCircleRadius) {
         float innerCircleRadius = mainCircleRadius - mCircleButtonRadius - mInnerCircleStrokeWidth; //250
-        Log.d("mainC", String.valueOf(mainCircleRadius));
-        Log.d("innerC", String.valueOf(innerCircleRadius));
         canvas.drawCircle(mCx, mCy, innerCircleRadius, mInnerCirclePaint);
     }
 
@@ -389,7 +409,7 @@ public class CircleAlarmTimerView extends View {
         canvas.save();
 
 
-        Log.d("measuredHeight=", String.valueOf(getMeasuredHeight())); //520
+//        Log.d("measuredHeight=", String.valueOf(getMeasuredHeight())); //520
         float circleY = (getMeasuredHeight() / 2) - mRadius + (mCircleStrokeWidth / 2) + mGapBetweenCircleAndLine; //50
         float circleTextY = circleY + (mCircleButtonRadius / 2); //65
         //circles
@@ -553,12 +573,12 @@ public class CircleAlarmTimerView extends View {
         this.mCx = width / 2;
         this.mCy = height / 2;
 
-        Log.d("/", "///////////////////");
-        Log.d("h", String.valueOf(height));
-        Log.d("w", String.valueOf(width));
-        Log.d("mcy", String.valueOf(mCy));
-        Log.d("mcx", String.valueOf(mCx));
-        Log.d("/", "///////////////////");
+//        Log.d("/", "///////////////////");
+//        Log.d("h", String.valueOf(height));
+//        Log.d("w", String.valueOf(width));
+//        Log.d("mcy", String.valueOf(mCy));
+//        Log.d("mcx", String.valueOf(mCx));
+//        Log.d("/", "///////////////////");
         // Radius
         if (mGapBetweenCircleAndLine + mCircleStrokeWidth >= mCircleButtonRadius) {
             this.mRadius = width / 2 - mCircleStrokeWidth / 2;
