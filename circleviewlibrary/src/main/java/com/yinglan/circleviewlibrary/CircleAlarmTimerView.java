@@ -506,16 +506,14 @@ public class CircleAlarmTimerView extends View {
                         mPrevMinute = mMinutes;
                         mMinutes = now;
                         Log.d("m", "prev:" + mPrevMinute + " now:" + mMinutes);
-                        //проскок между минутами если быстро крутить стрелку
-                        if (now == 0 && mPrevMinute == 59) {
+                        //if minuteCircleButton will move very fast, it will possible skip several minutes
+                        if ((now >= 0 && now <= 10) && (mPrevMinute <= 59 && mPrevMinute >= 50)) {
                             setHours(++mHours);
                         }
-                        if (now == 59 && mPrevMinute == 0) {
+                        if ((now <= 59 && now >= 50) && (mPrevMinute >= 0 && mPrevMinute <= 10)) {
                             setHours(--mHours);
                         }
                     }
-//                    if (mPrevMinute != mMinutes)
-//                        mPrevMinute = mMinutes;
                     invalidate();
                 }
                 break;
@@ -535,8 +533,8 @@ public class CircleAlarmTimerView extends View {
             newHours = 12 + newHours;
         }
         mHours = Math.abs(newHours % 12);
-        if (mHours==0){
-            mHours=12;
+        if (mHours == 0) {
+            mHours = 12;
         }
         Log.d("hours", "" + newHours + " " + mHours);
     }
