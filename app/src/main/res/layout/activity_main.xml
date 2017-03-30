@@ -32,7 +32,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout">
 
         <TextView
             android:id="@+id/start"
@@ -61,4 +62,23 @@
         android:layout_alignParentBottom="true"
         android:layout_margin="40dp"
         />
+
+    <Button
+        android:id="@+id/btnShowTimeToast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/linearLayout"
+        android:layout_marginTop="57dp"
+        android:text="showTime"/>
+
+    <Button
+        android:id="@+id/btnSetRandomTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/btnShowTimeToast"
+        android:text="SetRandom"/>
 </RelativeLayout>

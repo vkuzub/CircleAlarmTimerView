@@ -116,8 +116,6 @@ public class CircleAlarmTimerView extends View {
 
     private int mHours = 12;
     private int mMinutes;
-    private int mPrevMinute;
-
 
     private OnTimeChangedListener mListener;
 
@@ -271,7 +269,7 @@ public class CircleAlarmTimerView extends View {
 //      ard
 
 
-//        drawDigitalTime(canvas);
+        drawDigitalTime(canvas);
         drawCircleButtons(canvas);
 
 
@@ -515,8 +513,8 @@ public class CircleAlarmTimerView extends View {
         mCurrentTime = (int) (60 / (2 * Math.PI) * mCurrentRadian1 * 60);
         int now = (int) (mCurrentRadian1 * RAD_TO_HOURS_MULTIPLIER * 5);
         if (now != mMinutes) {
-            mPrevMinute = mMinutes;
-            mMinutes = now;
+            int mPrevMinute = mMinutes;
+            setMinutes(now);
             //if minuteCircleButton will move very fast, it will possible skip several minutes
             if ((now >= 0 && now <= 10) && (mPrevMinute <= 59 && mPrevMinute >= 50)) {
                 setHours(++mHours);
@@ -537,6 +535,10 @@ public class CircleAlarmTimerView extends View {
         if (mHours == 0) {
             mHours = 12;
         }
+    }
+
+    private void setMinutes(int newMinutes) {
+        mMinutes = newMinutes;
     }
 
     // Whether the down event inside circle button
@@ -640,4 +642,23 @@ public class CircleAlarmTimerView extends View {
 
         void end(String ending);
     }
+
+    public void setCurrentHour(int hour) {
+        setHours(hour);
+        invalidate();
+    }
+
+    public void setCurrentMinute(int minute) {
+        setMinutes(minute);
+        invalidate();
+    }
+
+    public String getCurrentHour() {
+        return getHours();
+    }
+
+    public String getCurrentMinute() {
+        return getMinutes();
+    }
+
 }
