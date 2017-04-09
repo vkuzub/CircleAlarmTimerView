@@ -81,4 +81,13 @@
         android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/btnShowTimeToast"
         android:text="SetRandom"/>
+
+    <CheckBox
+        android:id="@+id/cbDrawDigital"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/btnShowTimeToast"
+        android:layout_centerHorizontal="true"
+        android:checked="true"
+        android:text="digital"/>
 </RelativeLayout>

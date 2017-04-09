@@ -2,12 +2,17 @@ package com.yinglan.circlealarmtimerview;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yinglan.circleviewlibrary.CircleAlarmTimerView;
+
+import java.util.Random;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -17,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView textView2;
     private CircleAlarmTimerView circleAlarmTimerView;
     private Button setRandom, showTime;
+    private CheckBox cbDigital;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void initView(){
+    private void initView() {
         textView1 = (TextView) findViewById(R.id.start);
         textView2 = (TextView) findViewById(R.id.end);
 
@@ -43,11 +49,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        circleAlarmTimerView.drawDigitalClock(true);
+
         setRandom = (Button) findViewById(R.id.btnSetRandomTime);
         setRandom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                int minute = new Random().nextInt(60);
+                int hour = new Random().nextInt(12);
+                Log.d("set time", hour + " " + minute);
+                circleAlarmTimerView.setCurrentHour(hour);
+                circleAlarmTimerView.setCurrentMinute(minute);
             }
         });
 
@@ -55,8 +67,16 @@ public class MainActivity extends AppCompatActivity {
         showTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String time = circleAlarmTimerView.getCurrentHour()+":"+circleAlarmTimerView.getCurrentMinute();
-                Toast.makeText(getApplicationContext(),time,Toast.LENGTH_SHORT).show();
+                String time = circleAlarmTimerView.getCurrentHour() + ":" + circleAlarmTimerView.getCurrentMinute();
+                Toast.makeText(getApplicationContext(), time, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        cbDigital = (CheckBox) findViewById(R.id.cbDrawDigital);
+        cbDigital.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                circleAlarmTimerView.drawDigitalClock(isChecked);
             }
         });
     }
