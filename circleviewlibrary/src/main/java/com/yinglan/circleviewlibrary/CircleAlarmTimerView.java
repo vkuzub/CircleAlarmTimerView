@@ -56,7 +56,7 @@ public class CircleAlarmTimerView extends View {
 
     // Default color
     private static final int DEFAULT_CIRCLE_COLOR = 0xFFE9E2D9;
-    private static final int DEFAULT_CIRCLE_BUTTON_COLOR = 0xFF000000; //hour circle color
+    private static final int DEFAULT_CIRCLE_BUTTON_COLOR = 0xFF403E3F; //hour circle color
     private static final int DEFAULT_LINE_COLOR = 0xFFFFFFFF;
     private static final int DEFAULT_ARC_COLOR = 0xFF0099CC;
     private static final int DEFAULT_HIGHLIGHT_LINE_COLOR = 0xFF68C5D7;
@@ -64,8 +64,8 @@ public class CircleAlarmTimerView extends View {
     private static final int DEFAULT_TIMER_NUMBER_COLOR = 0xFFFFFFFF;
     private static final int DEFAULT_TIMER_COLON_COLOR = 0xFF000000; //minute circle color
     private static final int DEFAULT_TIMER_TEXT_COLOR = 0x99F0F9FF;
-    private static final int DEFAULT_TEXT_IN_CIRCLE_COLOR = 0xFF68C5D7;
-    private static final int DEFAULT_INNER_CIRCLE_COLOR = 0xFF2F2F2F;
+    private static final int DEFAULT_TEXT_IN_CIRCLE_COLOR = 0xFFFFFFFF;
+    private static final int DEFAULT_INNER_CIRCLE_COLOR = 0xFF403E3F;
 
     // Paint
     private Paint mCirclePaint;
@@ -155,7 +155,7 @@ public class CircleAlarmTimerView extends View {
                 .getResources().getDisplayMetrics());
         mTimerTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, DEFAULT_TIMER_TEXT_SIZE, getContext()
                 .getResources().getDisplayMetrics());
-        mTextInCircleSize = mTimerNumberSize / 2;
+        mTextInCircleSize = mTimerNumberSize / 2.3f;
         mInnerCircleStrokeWidth = mCircleStrokeWidth * 2;
 
         // Set default color or read xml attributes
@@ -278,11 +278,14 @@ public class CircleAlarmTimerView extends View {
 
     private void drawHandMinute(Canvas canvas, double pos) {
         Paint paint = new Paint();
-        paint.setColor(Color.WHITE);
-        paint.setStrokeWidth(5);
+        paint.setColor(Color.GRAY);
+        paint.setStrokeWidth(7);
         double angle =
                 ONE_MIN_ANGLE * pos - Math.PI / 2;
-        float handRadius = mRadius / 2;
+        float handRadius = mRadius / 1.7f;
+        if (mInCircleButton1) {
+            paint.setColor(Color.WHITE);
+        }
         canvas.drawLine(mCx, mCy,
                 (float) (mCx + Math.cos(angle) * handRadius),
                 (float) (mCy + Math.sin(angle) * handRadius),
@@ -291,11 +294,14 @@ public class CircleAlarmTimerView extends View {
 
     private void drawHandHour(Canvas canvas, double pos) {
         Paint paint = new Paint();
-        paint.setColor(Color.WHITE);
-        paint.setStrokeWidth(5);
+        paint.setStrokeWidth(8);
+        paint.setColor(Color.GRAY);
         double minuteAngle = ONE_MIN_ANGLE * mMinutes;
         double angle = ONE_MIN_ANGLE * pos * 5 - Math.PI / 2 + minuteAngle / 12;
-        float handRadius = mRadius / 3;
+        float handRadius = mRadius / 2.5f;
+        if (mInCircleButton) {
+            paint.setColor(Color.WHITE);
+        }
         canvas.drawLine(mCx, mCy,
                 (float) (mCx + Math.cos(angle) * handRadius),
                 (float) (mCy + Math.sin(angle) * handRadius),
@@ -304,14 +310,14 @@ public class CircleAlarmTimerView extends View {
 
     private void drawHandCircle(Canvas canvas) {
         Paint paint = new Paint();
-        paint.setColor(Color.WHITE);
+        paint.setColor(Color.GRAY);
         canvas.drawCircle(mCx, mCy, 12, paint);
     }
 
 
     private void drawNumerals(Canvas canvas, float mainCircleRadius) {
         Paint paint = new Paint();
-        paint.setTextSize((float) (mTextInCircleSize / 1.5));
+        paint.setTextSize((mTextInCircleSize / 1.8f));
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setColor(Color.WHITE);
         for (int number : numbers) {
@@ -319,8 +325,8 @@ public class CircleAlarmTimerView extends View {
             //поиск ширины
 //            paint.getTextBounds(tmp, 0, tmp.length(), rect);
             double angle = Math.PI / 6 * (number - 3);
-            float x = (float) (mCx + Math.cos(angle) * mainCircleRadius / 1.6);
-            float y = (float) (mCy + Math.sin(angle) * mainCircleRadius / 1.6);
+            float x = (float) (mCx + Math.cos(angle) * mainCircleRadius / 1.7);
+            float y = (float) (mCy + Math.sin(angle) * mainCircleRadius / 1.7);
             canvas.drawText(tmp, x, y, paint);
         }
     }
@@ -333,10 +339,17 @@ public class CircleAlarmTimerView extends View {
         double angle = 0;
         for (int i = 0; i < n; i++) {
             angle += 2 * Math.PI / n;
-            float x = (float) (mCx + Math.cos(angle) * mainCircleRadius / 1.25);
-            float y = (float) (mCy + Math.sin(angle) * mainCircleRadius / 1.25);
-            canvas.drawCircle(x, y, 3, paint);
+            float x = (float) (mCx + Math.cos(angle) * mainCircleRadius / 1.35);
+            float y = (float) (mCy + Math.sin(angle) * mainCircleRadius / 1.35);
+            if (i % 5 == 4) {
+                canvas.drawCircle(x, y, 4, paint);
+            } else {
+                canvas.drawCircle(x, y, 3, paint);
+            }
+            Log.d("numer line:", angle + "");
+            Log.d("numer line:", x + " " + y);
         }
+        Log.d("numer line:", "====");
     }
 
     private void drawMainCircle(Canvas canvas, float mainCircleRadius) {
@@ -486,8 +499,10 @@ public class CircleAlarmTimerView extends View {
             case MotionEvent.ACTION_UP:
                 if (mInCircleButton && isEnabled()) {
                     mInCircleButton = false;
+                    invalidate();
                 } else if (mInCircleButton1 && isEnabled()) {
                     mInCircleButton1 = false;
+                    invalidate();
                 }
                 break;
         }
