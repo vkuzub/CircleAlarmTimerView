@@ -79,5 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 circleAlarmTimerView.drawDigitalClock(isChecked);
             }
         });
+
+        setRandom.performClick();
     }
 }

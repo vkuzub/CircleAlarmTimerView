@@ -108,6 +108,7 @@ public class CircleAlarmTimerView extends View {
     private float mCy;
     private float mRadius;
     private float hourRadian;
+    private float hourRadianFake;
     private float minuteRadian;
     private float preRadian;
     private boolean mInCircleButton;
@@ -395,20 +396,16 @@ public class CircleAlarmTimerView extends View {
 
     // FIXME: 30.03.2017
     private void drawCircleHourButton(Canvas canvas, float circleY, float circleTextY) {
-//        double degrees = Math.toDegrees(hourRadian) + Math.toDegrees(minuteRadian) / 12;
-        double degrees = Math.toDegrees(hourRadian);
+        double degrees = Math.toDegrees(hourRadian) + Math.toDegrees(minuteRadian) / 12; //hour circle touch issue
+//        double degrees = Math.toDegrees(hourRadian); //stable
         Log.d("circleHour", "mr:" + minuteRadian + " prev" + prevMinuteRadian);
         double diff = Math.abs(minuteRadian - prevMinuteRadian);
         Log.d("circleHour", "diff:" + diff);
         if (diff >= (2 * Math.PI) / 60) {
             Log.d("circleHour", "diff");
         }
-//        hourRadian = (float) Math.toRadians(degrees);
-//        double mCurrentRadian0 = (float) Math.toRadians(degrees);
-//        double minuteDiffRad = minuteRadian / 60;
-//        double mCurrentRadian01 = hourRadian + minuteDiffRad;
-//        Log.d("circleHour",  "mcurrad0:" + mCurrentRadian0 + " mcurrad01:" + mCurrentRadian01);
-        Log.d("circleHour", "d:" + degrees + " mcurrad:" + hourRadian + " mcurrad1:" + minuteRadian);
+        hourRadianFake = (float) Math.toRadians(degrees);
+        Log.d("circleHour", "d:" + degrees + " hourRad:" + hourRadian + " hourRadFake: " + hourRadianFake + " minRad1:" + minuteRadian);
         canvas.rotate((float) degrees, mCx, mCy);
         canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mCircleButtonPaint);
         drawTextInCircleButton(canvas, getHours(), mCx, circleTextY);
@@ -446,7 +443,7 @@ public class CircleAlarmTimerView extends View {
                     mInCircleButton = true;
                     ismInCircleButton = false;
                     preRadian = getRadian(event.getX(), event.getY());
-                    Log.d(TAG, "In circle button");
+                    Log.d(TAG, "In circle button x=" + event.getX() + " y=" + event.getY());
                 } else if (mInCircleButton1(event.getX(), event.getY()) && isEnabled()) {
                     mInCircleButton1 = true;
                     ismInCircleButton = true;
@@ -567,7 +564,14 @@ public class CircleAlarmTimerView extends View {
         float r = mRadius - mCircleStrokeWidth / 2 - mGapBetweenCircleAndLine;
         float x2 = (float) (mCx + r * Math.sin(hourRadian));
         float y2 = (float) (mCy - r * Math.cos(hourRadian));
-        if (Math.sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2)) < mCircleButtonRadius) {
+        float x2f = (float) (mCx + r * Math.sin(hourRadianFake));
+        float y2f = (float) (mCy - r * Math.cos(hourRadianFake));
+        double square = Math.sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2));
+        double squareFake = Math.sqrt((x - x2f) * (x - x2f) + (y - y2f) * (y - y2f));
+        if (square < mCircleButtonRadius) {
+            return true;
+        }
+        if (squareFake < mCircleButtonRadius) {
             return true;
         }
         return false;
@@ -667,6 +671,10 @@ public class CircleAlarmTimerView extends View {
 
     public String getCurrentHour() {
         return getHours();
+    }
+
+    public String getCurrentHour24() {
+        return String.valueOf(mHours + 12);
     }
 
     public String getCurrentMinute() {
