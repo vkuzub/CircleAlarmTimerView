@@ -398,14 +398,16 @@ public class CircleAlarmTimerView extends View {
     private void drawCircleHourButton(Canvas canvas, float circleY, float circleTextY) {
         double degrees = Math.toDegrees(hourRadian) + Math.toDegrees(minuteRadian) / 12; //hour circle touch issue
 //        double degrees = Math.toDegrees(hourRadian); //stable
-        Log.d("circleHour", "mr:" + minuteRadian + " prev" + prevMinuteRadian);
-        double diff = Math.abs(minuteRadian - prevMinuteRadian);
-        Log.d("circleHour", "diff:" + diff);
-        if (diff >= (2 * Math.PI) / 60) {
-            Log.d("circleHour", "diff");
-        }
+
+//        Log.d("circleHour", "mr:" + minuteRadian + " prev" + prevMinuteRadian);
+//        double diff = Math.abs(minuteRadian - prevMinuteRadian);
+//        Log.d("circleHour", "diff:" + diff);
+//        if (diff >= (2 * Math.PI) / 60) {
+//            Log.d("circleHour", "diff");
+//        }
+
         hourRadianFake = (float) Math.toRadians(degrees);
-        Log.d("circleHour", "d:" + degrees + " hourRad:" + hourRadian + " hourRadFake: " + hourRadianFake + " minRad1:" + minuteRadian);
+//        Log.d("circleHour", "d:" + degrees + " hourRad:" + hourRadian + " hourRadFake: " + hourRadianFake + " minRad1:" + minuteRadian);
         canvas.rotate((float) degrees, mCx, mCy);
         canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mCircleButtonPaint);
         drawTextInCircleButton(canvas, getHours(), mCx, circleTextY);
