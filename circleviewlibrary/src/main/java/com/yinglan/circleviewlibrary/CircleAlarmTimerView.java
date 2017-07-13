@@ -401,7 +401,7 @@ public class CircleAlarmTimerView extends View {
         canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mCircleButtonPaint);
         canvas.restore();
         canvas.save();
-        drawTextInCircleButton(canvas, getHours(), mCx, hourRadian);
+        drawTextInCircleButton(canvas, getHours(), mCx, hourRadianFake);
     }
 
     private void drawCircleMinuteButton(Canvas canvas, float circleY) {
