@@ -32,12 +32,14 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
+import static java.lang.Math.PI;
+
 
 public class CircleAlarmTimerView extends View {
     private static final String TAG = "CircleTimerView";
 
     public static final double RAD_TO_HOURS_MULTIPLIER = 1.909859;
-    public static final double ONE_MIN_ANGLE = 2 * Math.PI / 60;
+    public static final double ONE_MIN_ANGLE = 2 * PI / 60;
     public static final int HOURS_SECTIONS_NUM = 5;
     private final int[] numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
 
@@ -119,6 +121,7 @@ public class CircleAlarmTimerView extends View {
     private int mHours = 12;
     private int mMinutes;
     private boolean drawDigital;
+    private boolean rotateTextInCircleButton = true;
 
     private double prevMinuteRadian;
 
@@ -250,10 +253,10 @@ public class CircleAlarmTimerView extends View {
         canvas.save();
 
         //main circle with 2 small circles
-        float mainCircleRadius = mRadius - mCircleStrokeWidth / 2 - mGapBetweenCircleAndLine; //300
-        drawMainCircle(canvas, mainCircleRadius);
+        float mainCircleRadius = mRadius - mCircleStrokeWidth / 2 - mGapBetweenCircleAndLine;
+        drawMainCircle(canvas, mainCircleRadius); //R = 198
 
-        drawInnerCircle(canvas, mainCircleRadius);
+        drawInnerCircle(canvas, mainCircleRadius);//R = 164
 
         if (drawDigital) {
             drawDigitalTime(canvas);
@@ -282,7 +285,7 @@ public class CircleAlarmTimerView extends View {
         paint.setColor(Color.GRAY);
         paint.setStrokeWidth(7);
         double angle =
-                ONE_MIN_ANGLE * pos - Math.PI / 2;
+                ONE_MIN_ANGLE * pos - PI / 2;
         float handRadius = mRadius / 1.7f;
         if (mInCircleButton1) {
             paint.setColor(Color.WHITE);
@@ -298,7 +301,7 @@ public class CircleAlarmTimerView extends View {
         paint.setStrokeWidth(8);
         paint.setColor(Color.GRAY);
         double minuteAngle = ONE_MIN_ANGLE * mMinutes;
-        double angle = ONE_MIN_ANGLE * pos * 5 - Math.PI / 2 + minuteAngle / 12;
+        double angle = ONE_MIN_ANGLE * pos * 5 - PI / 2 + minuteAngle / 12;
         float handRadius = mRadius / 2.5f;
         if (mInCircleButton) {
             paint.setColor(Color.WHITE);
@@ -325,7 +328,7 @@ public class CircleAlarmTimerView extends View {
             String tmp = String.valueOf(number);
             //поиск ширины
 //            paint.getTextBounds(tmp, 0, tmp.length(), rect);
-            double angle = Math.PI / 6 * (number - 3);
+            double angle = PI / 6 * (number - 3);
             float x = (float) (mCx + Math.cos(angle) * mainCircleRadius / 1.7);
             float y = (float) (mCy + Math.sin(angle) * mainCircleRadius / 1.7);
             canvas.drawText(tmp, x, y, paint);
@@ -339,7 +342,7 @@ public class CircleAlarmTimerView extends View {
         int n = 60;
         double angle = 0;
         for (int i = 0; i < n; i++) {
-            angle += 2 * Math.PI / n;
+            angle += 2 * PI / n;
             float x = (float) (mCx + Math.cos(angle) * mainCircleRadius / 1.35);
             float y = (float) (mCy + Math.sin(angle) * mainCircleRadius / 1.35);
             if (i % 5 == 4) {
@@ -347,10 +350,7 @@ public class CircleAlarmTimerView extends View {
             } else {
                 canvas.drawCircle(x, y, 3, paint);
             }
-            Log.d("numer line:", angle + "");
-            Log.d("numer line:", x + " " + y);
         }
-        Log.d("numer line:", "====");
     }
 
     private void drawMainCircle(Canvas canvas, float mainCircleRadius) {
@@ -391,7 +391,6 @@ public class CircleAlarmTimerView extends View {
             drawCircleMinuteButton(canvas, circleY, circleTextY);
             drawCircleHourButton(canvas, circleY, circleTextY);
         }
-        Log.d("radians", "" + hourRadian + " " + minuteRadian);
     }
 
     // FIXME: 30.03.2017
@@ -410,22 +409,34 @@ public class CircleAlarmTimerView extends View {
 //        Log.d("circleHour", "d:" + degrees + " hourRad:" + hourRadian + " hourRadFake: " + hourRadianFake + " minRad1:" + minuteRadian);
         canvas.rotate((float) degrees, mCx, mCy);
         canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mCircleButtonPaint);
-        drawTextInCircleButton(canvas, getHours(), mCx, circleTextY);
+        Log.d("drawCircleHourButton", "x=" + mCx + " y=" + circleY); //272;50
         canvas.restore();
         canvas.save();
-
+//        drawTextInCircleButton(canvas, getHours(), mCx, hourRadian);
     }
 
     private void drawCircleMinuteButton(Canvas canvas, float circleY, float circleTextY) {
         canvas.rotate((float) Math.toDegrees(minuteRadian), mCx, mCy);
+//        canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mTimerColonPaint);
         canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mTimerColonPaint);
-        drawTextInCircleButton(canvas, getMinutes(), mCx, circleTextY);
+        Log.d("drawCircleMinuteButton", "x=" + mCx + " y=" + circleY); //272;50
         canvas.restore();
         canvas.save();
+        drawTextInCircleButton(canvas, getMinutes(), mCx, minuteRadian);
     }
 
-    private void drawTextInCircleButton(Canvas canvas, String time, float x, float y) {
-        canvas.drawText(time, x, y, mTextInCirclePaint);
+    private void drawTextInCircleButton(Canvas canvas, String time, float R, float radians) {
+        Paint paint = new Paint();
+        paint.setColor(Color.BLUE);
+        paint.setTextSize(32f);
+        float radius = R;
+        radians = (float) (PI - radians);
+        float x = (float) ((radius * Math.sin(radians)) + R);
+        float y = (float) ((radius * Math.cos(radians)) + R);
+        Log.d("drawTextInCircleButton", "radians=" + radians + " R=" + R);
+        Log.d("drawTextInCircleButton", "x=" + x + " y=" + y); //272;65
+        canvas.drawText(time, x, y, paint);
+//        canvas.drawText(time, x, y, mTextInCirclePaint);
     }
 
     private float getFontHeight(Paint paint) {
@@ -456,17 +467,17 @@ public class CircleAlarmTimerView extends View {
                 if (mInCircleButton && isEnabled()) {
                     float temp = getRadian(event.getX(), event.getY());
                     if (preRadian > Math.toRadians(270) && temp < Math.toRadians(90)) {
-                        preRadian -= 2 * Math.PI;
+                        preRadian -= 2 * PI;
                     } else if (preRadian < Math.toRadians(90) && temp > Math.toRadians(270)) {
-                        preRadian = (float) (temp + (temp - 2 * Math.PI) - preRadian);
+                        preRadian = (float) (temp + (temp - 2 * PI) - preRadian);
                     }
                     hourRadian += (temp - preRadian);
                     preRadian = temp;
-                    if (hourRadian > 2 * Math.PI) {
-                        hourRadian -= (float) (2 * Math.PI);
+                    if (hourRadian > 2 * PI) {
+                        hourRadian -= (float) (2 * PI);
                     }
                     if (hourRadian < 0) {
-                        hourRadian += (float) (2 * Math.PI);
+                        hourRadian += (float) (2 * PI);
                     }
                     calcHours();
 
@@ -476,17 +487,17 @@ public class CircleAlarmTimerView extends View {
 
                     float temp = getRadian(event.getX(), event.getY());
                     if (preRadian > Math.toRadians(270) && temp < Math.toRadians(90)) {
-                        preRadian -= 2 * Math.PI;
+                        preRadian -= 2 * PI;
                     } else if (preRadian < Math.toRadians(90) && temp > Math.toRadians(270)) {
-                        preRadian = (float) (temp + (temp - 2 * Math.PI) - preRadian);
+                        preRadian = (float) (temp + (temp - 2 * PI) - preRadian);
                     }
                     minuteRadian += (temp - preRadian);
                     preRadian = temp;
-                    if (minuteRadian > 2 * Math.PI) {
-                        minuteRadian -= (float) (2 * Math.PI);
+                    if (minuteRadian > 2 * PI) {
+                        minuteRadian -= (float) (2 * PI);
                     }
                     if (minuteRadian < 0) {
-                        minuteRadian += (float) (2 * Math.PI);
+                        minuteRadian += (float) (2 * PI);
                     }
 //                    hourRadian += minuteRadian / 60;
 
@@ -513,13 +524,13 @@ public class CircleAlarmTimerView extends View {
     }
 
     private void calcHours() {
-        mCurrentTime = (int) (60 / (2 * Math.PI) * hourRadian * 60);
+        mCurrentTime = (int) (60 / (2 * PI) * hourRadian * 60);
         int hours = (int) (hourRadian * RAD_TO_HOURS_MULTIPLIER);
         setHours(hours);
     }
 
     private void calcMinutes() {
-        mCurrentTime = (int) (60 / (2 * Math.PI) * minuteRadian * 60);
+        mCurrentTime = (int) (60 / (2 * PI) * minuteRadian * 60);
         int now = (int) (minuteRadian * RAD_TO_HOURS_MULTIPLIER * 5);
         if (now != mMinutes) {
             int mPrevMinute = mMinutes;
@@ -585,13 +596,13 @@ public class CircleAlarmTimerView extends View {
         // Quadrant
         if (x > mCx && y > mCy) {
             // 2
-            alpha += Math.PI;
+            alpha += PI;
         } else if (x < mCx && y > mCy) {
             // 3
-            alpha += Math.PI;
+            alpha += PI;
         } else if (x < mCx && y < mCy) {
             // 4
-            alpha = (float) (2 * Math.PI + alpha);
+            alpha = (float) (2 * PI + alpha);
         }
         return alpha;
     }
@@ -636,7 +647,7 @@ public class CircleAlarmTimerView extends View {
             Bundle bundle = (Bundle) state;
             super.onRestoreInstanceState(bundle.getParcelable(INSTANCE_STATUS));
             hourRadian = bundle.getFloat(STATUS_RADIAN);
-            mCurrentTime = (int) (60 / (2 * Math.PI) * hourRadian * 60);
+            mCurrentTime = (int) (60 / (2 * PI) * hourRadian * 60);
             return;
         }
         super.onRestoreInstanceState(state);
@@ -688,4 +699,11 @@ public class CircleAlarmTimerView extends View {
         invalidate();
     }
 
+    public boolean isRotateTextInCircleButton() {
+        return rotateTextInCircleButton;
+    }
+
+    public void setRotateTextInCircleButton(boolean rotateTextInCircleButton) {
+        this.rotateTextInCircleButton = rotateTextInCircleButton;
+    }
 }

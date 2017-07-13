@@ -57,11 +57,12 @@
 
     <com.yinglan.circleviewlibrary.CircleAlarmTimerView
         android:id="@+id/circletimerview"
-        android:layout_width="wrap_content"
+        android:layout_width="260dp"
         android:layout_height="260dp"
+        android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="40dp"
-        />
+        android:background="@color/colorAccent"/>
 
     <Button
         android:id="@+id/btnShowTimeToast"
