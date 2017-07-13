@@ -385,58 +385,41 @@ public class CircleAlarmTimerView extends View {
         if (ismInCircleButton) {
 //            Path path = new Path();
 //            canvas.drawTextOnPath();
-            drawCircleHourButton(canvas, circleY, circleTextY);
-            drawCircleMinuteButton(canvas, circleY, circleTextY);
+            drawCircleHourButton(canvas, circleY);
+            drawCircleMinuteButton(canvas, circleY);
         } else {
-            drawCircleMinuteButton(canvas, circleY, circleTextY);
-            drawCircleHourButton(canvas, circleY, circleTextY);
+            drawCircleMinuteButton(canvas, circleY);
+            drawCircleHourButton(canvas, circleY);
         }
     }
 
     // FIXME: 30.03.2017
-    private void drawCircleHourButton(Canvas canvas, float circleY, float circleTextY) {
+    private void drawCircleHourButton(Canvas canvas, float circleY) {
         double degrees = Math.toDegrees(hourRadian) + Math.toDegrees(minuteRadian) / 12; //hour circle touch issue
-//        double degrees = Math.toDegrees(hourRadian); //stable
-
-//        Log.d("circleHour", "mr:" + minuteRadian + " prev" + prevMinuteRadian);
-//        double diff = Math.abs(minuteRadian - prevMinuteRadian);
-//        Log.d("circleHour", "diff:" + diff);
-//        if (diff >= (2 * Math.PI) / 60) {
-//            Log.d("circleHour", "diff");
-//        }
-
         hourRadianFake = (float) Math.toRadians(degrees);
-//        Log.d("circleHour", "d:" + degrees + " hourRad:" + hourRadian + " hourRadFake: " + hourRadianFake + " minRad1:" + minuteRadian);
         canvas.rotate((float) degrees, mCx, mCy);
         canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mCircleButtonPaint);
-        Log.d("drawCircleHourButton", "x=" + mCx + " y=" + circleY); //272;50
         canvas.restore();
         canvas.save();
-//        drawTextInCircleButton(canvas, getHours(), mCx, hourRadian);
+        drawTextInCircleButton(canvas, getHours(), mCx, hourRadian);
     }
 
-    private void drawCircleMinuteButton(Canvas canvas, float circleY, float circleTextY) {
+    private void drawCircleMinuteButton(Canvas canvas, float circleY) {
         canvas.rotate((float) Math.toDegrees(minuteRadian), mCx, mCy);
-//        canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mTimerColonPaint);
         canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mTimerColonPaint);
-        Log.d("drawCircleMinuteButton", "x=" + mCx + " y=" + circleY); //272;50
         canvas.restore();
         canvas.save();
         drawTextInCircleButton(canvas, getMinutes(), mCx, minuteRadian);
     }
 
     private void drawTextInCircleButton(Canvas canvas, String time, float R, float radians) {
-        Paint paint = new Paint();
-        paint.setColor(Color.BLUE);
-        paint.setTextSize(32f);
-        float radius = R;
+        float radius = R - 62; //hardcode
         radians = (float) (PI - radians);
-        float x = (float) ((radius * Math.sin(radians)) + R);
-        float y = (float) ((radius * Math.cos(radians)) + R);
-        Log.d("drawTextInCircleButton", "radians=" + radians + " R=" + R);
-        Log.d("drawTextInCircleButton", "x=" + x + " y=" + y); //272;65
-        canvas.drawText(time, x, y, paint);
-//        canvas.drawText(time, x, y, mTextInCirclePaint);
+        int textWidthBias = 12; //hardcode
+        int textHeightBias = 2; //hardcode
+        float x = (float) ((radius * Math.sin(radians)) + R) + textHeightBias;
+        float y = (float) ((radius * Math.cos(radians)) + R) + textWidthBias;
+        canvas.drawText(time, x, y, mTextInCirclePaint);
     }
 
     private float getFontHeight(Paint paint) {
