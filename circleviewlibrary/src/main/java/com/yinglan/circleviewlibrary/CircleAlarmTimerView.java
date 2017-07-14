@@ -385,15 +385,25 @@ public class CircleAlarmTimerView extends View {
         if (ismInCircleButton) {
 //            Path path = new Path();
 //            canvas.drawTextOnPath();
-            drawCircleHourButton(canvas, circleY);
-            drawCircleMinuteButton(canvas, circleY);
+            if (rotateTextInCircleButton) {
+                drawCircleHourButton(canvas, circleY, circleTextY);
+                drawCircleMinuteButton(canvas, circleY, circleTextY);
+            } else {
+                drawCircleHourButton(canvas, circleY);
+                drawCircleMinuteButton(canvas, circleY);
+            }
+
         } else {
-            drawCircleMinuteButton(canvas, circleY);
-            drawCircleHourButton(canvas, circleY);
+            if (rotateTextInCircleButton) {
+                drawCircleHourButton(canvas, circleY, circleTextY);
+                drawCircleMinuteButton(canvas, circleY, circleTextY);
+            } else {
+                drawCircleMinuteButton(canvas, circleY);
+                drawCircleHourButton(canvas, circleY);
+            }
         }
     }
 
-    // FIXME: 30.03.2017
     private void drawCircleHourButton(Canvas canvas, float circleY) {
         double degrees = Math.toDegrees(hourRadian) + Math.toDegrees(minuteRadian) / 12; //hour circle touch issue
         hourRadianFake = (float) Math.toRadians(degrees);
@@ -413,13 +423,35 @@ public class CircleAlarmTimerView extends View {
     }
 
     private void drawTextInCircleButton(Canvas canvas, String time, float R, float radians) {
-        float radius = R - 62; //hardcode
-        radians = (float) (PI - radians);
-        int textWidthBias = 12; //hardcode
-        int textHeightBias = 2; //hardcode
-        float x = (float) ((radius * Math.sin(radians)) + R) + textHeightBias;
-        float y = (float) ((radius * Math.cos(radians)) + R) + textWidthBias;
-        canvas.drawText(time, x, y, mTextInCirclePaint);
+        if (rotateTextInCircleButton) {
+            canvas.drawText(time, R, radians, mTextInCirclePaint);
+        } else {
+            float radius = R - 62; //hardcode
+            radians = (float) (PI - radians);
+            int textWidthBias = 12; //hardcode
+            int textHeightBias = 2; //hardcode
+            float x = (float) ((radius * Math.sin(radians)) + R) + textHeightBias;
+            float y = (float) ((radius * Math.cos(radians)) + R) + textWidthBias;
+            canvas.drawText(time, x, y, mTextInCirclePaint);
+        }
+    }
+
+    private void drawCircleHourButton(Canvas canvas, float circleY, float circleTextY) {
+        double degrees = Math.toDegrees(hourRadian) + Math.toDegrees(minuteRadian) / 12; //hour circle touch issue
+        hourRadianFake = (float) Math.toRadians(degrees);
+        canvas.rotate((float) degrees, mCx, mCy);
+        canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mCircleButtonPaint);
+        drawTextInCircleButton(canvas, getHours(), mCx, circleTextY);
+        canvas.restore();
+        canvas.save();
+    }
+
+    private void drawCircleMinuteButton(Canvas canvas, float circleY, float circleTextY) {
+        canvas.rotate((float) Math.toDegrees(minuteRadian), mCx, mCy);
+        canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mTimerColonPaint);
+        drawTextInCircleButton(canvas, getMinutes(), mCx, circleTextY);
+        canvas.restore();
+        canvas.save();
     }
 
     private float getFontHeight(Paint paint) {

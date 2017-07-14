@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         circleAlarmTimerView.drawDigitalClock(true);
+        circleAlarmTimerView.setRotateTextInCircleButton(false);
 
         setRandom = (Button) findViewById(R.id.btnSetRandomTime);
         setRandom.setOnClickListener(new View.OnClickListener() {
