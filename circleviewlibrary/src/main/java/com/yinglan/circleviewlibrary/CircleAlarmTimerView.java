@@ -40,6 +40,7 @@ public class CircleAlarmTimerView extends View {
 
     public static final double RAD_TO_HOURS_MULTIPLIER = 1.909859;
     public static final double ONE_MIN_ANGLE = 2 * PI / 60;
+    public static final double ONE_HOUR_ANGLE = 2 * PI / 60;
     public static final int HOURS_SECTIONS_NUM = 5;
     private final int[] numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
 
@@ -392,7 +393,6 @@ public class CircleAlarmTimerView extends View {
                 drawCircleHourButton(canvas, circleY);
                 drawCircleMinuteButton(canvas, circleY);
             }
-
         } else {
             if (rotateTextInCircleButton) {
                 drawCircleHourButton(canvas, circleY, circleTextY);
@@ -405,7 +405,7 @@ public class CircleAlarmTimerView extends View {
     }
 
     private void drawCircleHourButton(Canvas canvas, float circleY) {
-        double degrees = Math.toDegrees(hourRadian) + Math.toDegrees(minuteRadian) / 12; //hour circle touch issue
+        double degrees = 30 * mHours + (6 * mMinutes) / 12;
         hourRadianFake = (float) Math.toRadians(degrees);
         canvas.rotate((float) degrees, mCx, mCy);
         canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mCircleButtonPaint);
@@ -415,6 +415,7 @@ public class CircleAlarmTimerView extends View {
     }
 
     private void drawCircleMinuteButton(Canvas canvas, float circleY) {
+//        double degress = 6 * mMinutes;
         canvas.rotate((float) Math.toDegrees(minuteRadian), mCx, mCy);
         canvas.drawCircle(mCx, circleY, mCircleButtonRadius, mTimerColonPaint);
         canvas.restore();
@@ -471,7 +472,7 @@ public class CircleAlarmTimerView extends View {
                     mInCircleButton = true;
                     ismInCircleButton = false;
                     preRadian = getRadian(event.getX(), event.getY());
-                    Log.d(TAG, "In circle button x=" + event.getX() + " y=" + event.getY());
+//                    Log.d(TAG, "In circle button x=" + event.getX() + " y=" + event.getY());
                 } else if (mInCircleButton1(event.getX(), event.getY()) && isEnabled()) {
                     mInCircleButton1 = true;
                     ismInCircleButton = true;
@@ -624,7 +625,7 @@ public class CircleAlarmTimerView extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        Log.d(TAG, "onMeasure");
+//        Log.d(TAG, "onMeasure");
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         // Ensure width = height
         int height = MeasureSpec.getSize(heightMeasureSpec);
